@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Source Code to Android App Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+        header {
+            width: 100%;
+            padding: 20px;
+            background-color: #4CAF50;
+            color: white;
+        }
+        header h1 {
+            margin: 0;
+        }
+        main {
+            padding: 20px;
+        }
+        #upload-container, #convert-container, #download-container {
+            margin: 20px 0;
+        }
+        #progress-container {
+            display: none;
+            margin: 20px 0;
+        }
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        footer {
+            margin-top: auto;
+            width: 100%;
+            padding: 10px;
+            background-color: #f1f1f1;
+        }
+        footer a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Source Code to Android App</h1>
+    </header>
+
+    <main>
+        <p>Now it is very easy to create Android apps, just create a zip file of your source code and upload it.</p>
+
+        <div id="upload-container">
+            <button class="btn" id="upload-button">Upload Source Code</button>
+            <input type="file" id="file-input" accept=".zip" style="display: none;">
+        </div>
+
+        <div id="convert-container" style="display: none;">
+            <button class="btn" id="convert-button">Convert To App</button>
+        </div>
+
+        <div id="progress-container">
+            <p>Converting...</p>
+            <progress id="progress-bar" value="0" max="100"></progress>
+        </div>
+
+        <div id="download-container" style="display: none;">
+            <button class="btn" id="download-button">Download Your App</button>
+        </div>
+    </main>
+
+    <footer>
+        <a href="#">Home</a>
+        <a href="#">Privacy and Security</a>
+        <a href="#">About Us</a>
+        <a href="#">Contact Us</a>
+    </footer>
+
+    <script>
+        const uploadButton = document.getElementById('upload-button');
+        const fileInput = document.getElementById('file-input');
+        const convertButton = document.getElementById('convert-button');
+        const progressContainer = document.getElementById('progress-container');
+        const progressBar = document.getElementById('progress-bar');
+        const downloadButton = document.getElementById('download-button');
+        const convertContainer = document.getElementById('convert-container');
+        const downloadContainer = document.getElementById('download-container');
+
+        uploadButton.addEventListener('click', () => fileInput.click());
+        
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (file) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        convertContainer.style.display = 'block';
+                    } else {
+                        alert('Failed to upload file.');
+                    }
+                });
+            }
+        });
+
+        convertButton.addEventListener('click', () => {
+            progressContainer.style.display = 'block';
+            convertContainer.style.display = 'none';
+
+            const interval = setInterval(() => {
+                progressBar.value += 10;
+                if (progressBar.value >= 100) {
+                    clearInterval(interval);
+                    downloadContainer.style.display = 'block';
+                    progressContainer.style.display = 'none';
+                }
+            }, 500);
+        });
+
+        downloadButton.addEventListener('click', () => {
+            window.location.href = '/download';
+            setTimeout(() => window.location.reload(), 1000);
+        });
+    </script>
+</body>
+</html>
